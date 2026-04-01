@@ -1,7 +1,14 @@
 ---
 title: "Bayesian Kelly Criterion: From Point Estimate to Probability Distribution"
 subtitle: "Four scenarios showing why treating your edge as uncertain produces better position sizing"
-abstract: "Kelly's formula assumes you know your edge. You don't. This project walks through four scenarios that demonstrate what happens when you treat win probability as a Beta-distributed random variable rather than a known constant — and why the resulting position sizes are more defensible, more robust, and better calibrated to your actual level of certainty."
+abstract: "The Kelly Criterion holds a unique spot in finance. It is often cited, misused, and rarely tested against its own assumptions. The formula works best when the win probability is known exactly. In reality, win probabilities come from limited historical data, which can be noisy. For example, a strategy that won 58% of its last 12 trades might really have a true win rate anywhere from 40% to 75%. The standard Kelly calculation ignores this uncertainty. It turns a noisy estimate into a confident position size. </br> </br>
+
+This project says that direct translation risks Kelly-based sizing. It can lead to serious, unmeasured issues. The proposed method treats win probability as a Beta-distributed random variable, not a fixed number. Wins and losses update a prior distribution using Bayes' theorem. This produces a posterior that shows both the evidence and remaining uncertainty. By applying the Kelly formula to 10,000 draws from this posterior, we get a range of recommended stakes. This range is broad with weak evidence and narrow with strong evidence. This results in a cautious, percentile-based policy. </br> </br>
+
+The 25th percentile of this distribution, called p25, is the suggested default stake. It’s optimal if the true win rate falls within the upper three-quarters of the uncertainty range. Four scenarios demonstrate the practical effects of this framework. With just 12 observations, the posterior is too broad. It can’t confidently support a 16% stake based on a point estimate. Kelly responds with a near-zero size at the conservative percentile. </br> </br>
+
+The second and third scenarios show that as more evidence comes in, the p25 recommendation moves closer to full Kelly. This illustrates the framework’s self-correcting nature. The fourth scenario is crucial. It uses the same inputs as the first but simulates outcomes at a true win rate of 52%, rather than the posterior mean of 56%. This small difference highlights how in-sample models can overstate out-of-sample performance. Full Kelly is heavily punished, while the p25 stake remains intact. The overconfidence premium is the gap between median and conservative Kelly recommendations. This gap helps risk managers and investment committees see how reliable an edge estimate is."
+
 author: "Patrick Lefler"
 date: 17-Mar-2026
 format:
@@ -841,7 +848,7 @@ Scenario 3 is the payoff for patience. With 50 trials and a stronger prior, the 
 
 Scenario 4 uses the same inputs as Scenario 1, so its Kelly fractions are identical. But the simulation uses a true win rate of only 52% rather than the posterior mean. The table shows what the model recommends; the trajectory charts show what actually happens. The p25 Kelly stake, already near zero because the posterior was wide, essentially sits out the damage. Full Kelly does not.
 
-## Takeaways for risk managers
+## Takeaways & Conclusion
 
 Most practitioners learn the Kelly formula as a single equation that spits out a single number: stake this percentage of your bankroll. The formula is mathematically elegant and provably optimal — but optimal only under a condition that is almost never true in practice. That condition is that you know your edge precisely. You don’t. Nobody does. Every win rate estimate comes from a finite sample of data, and finite samples are noisy. The Bayesian Kelly framework in this project is simply the Kelly formula with that noise made explicit.
 
