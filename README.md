@@ -1,4 +1,4 @@
-# Bayesian Kelly: From Point Estimate to Probability Distribution
+# Bayesian Kelly Criterion: From Point Estimate to Probability Distribution
 
 **Author:** Patrick Lefler  </br>
 **Published:** 2026-03-17 </br>
