@@ -16,6 +16,8 @@ typography:
       source: google
       weight: [300, 400, 500]
       style: normal
+    - family: Space Mono
+      source: google
   base: 
     family: Roboto
     weight: 400
@@ -23,5 +25,6 @@ typography:
     family: Roboto
     color: dark-grey
     weight: 500
+  monospace: Space Mono
 
 
