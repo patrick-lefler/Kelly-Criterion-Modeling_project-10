@@ -1,8 +1,8 @@
 # Bayesian Kelly: From Point Estimate to Probability Distribution
 
-**Author:** Patrick Lefler  
-**Published:** 2026-03-17
-**Project #:** Project-10
+**Author:** Patrick Lefler  </br>
+**Published:** 2026-03-17 </br>
+**Project #:** Project-10 </br>
 **Tools:** R · Quarto · Plotly · ggplot2 · kableExtra
 
 ---
