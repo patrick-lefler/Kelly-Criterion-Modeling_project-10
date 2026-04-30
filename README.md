@@ -3,8 +3,10 @@
 > Four scenarios showing why treating your edge as uncertain produces better position sizing than a single-number Kelly estimate.
 
 **Author:** Patrick Lefler
+
 **Published:** March 17, 2026
-**Rendered:**
+
+**Rendered:** https://patrick-lefler.github.io/rQuarto_kelly_criterion_modeling_project_2026-03-17/
 
 ---
 
