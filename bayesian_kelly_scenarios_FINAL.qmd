@@ -905,4 +905,4 @@ sessioninfo::session_info()
 
 ---
 
-*Rendered with [Quarto](https://quarto.org/) · Packages: `plotly`, `dplyr`, `tidyr`, `ggplot2`, `knitr`, `kableExtra`, `scales`, `htmltools`, `sessioninfo`*
+*Rendered with [Quarto](https://quarto.org/) · Packages:  `dplyr` `htmltools`  `kableExtra` `knitr`  `plotly` `scales`  `sessioninfo` `tidyverse`*
