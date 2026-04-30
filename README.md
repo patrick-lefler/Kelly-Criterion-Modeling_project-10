@@ -1,96 +1,62 @@
 # Bayesian Kelly Criterion: From Point Estimate to Probability Distribution
 
-**Author:** Patrick Lefler  </br>
-**Published:** 2026-03-17 </br>
-**Project #:** Project-10 </br>
-**Tools:** R · Quarto · Plotly · ggplot2 · kableExtra
+> Four scenarios showing why treating your edge as uncertain produces better position sizing than a single-number Kelly estimate.
+
+**Author:** Patrick Lefler
+**Published:** March 17, 2026
+**Rendered:**
+
+---
+
+## Project Introduction
+
+> Replaces the standard Kelly Criterion's fixed win-probability assumption with a Beta-distributed posterior, generating a full distribution of recommended stakes — sized conservatively by evidence quality, not confidence alone.
 
 ---
 
 ## Overview
 
-The Kelly Criterion holds a unique spot in finance. It is often cited, misused, and rarely tested against its own assumptions. The formula works best when the win probability is known exactly. In reality, win probabilities come from limited historical data, which can be noisy. For example, a strategy that won 58% of its last 12 trades might really have a true win rate anywhere from 40% to 75%. The standard Kelly calculation ignores this uncertainty. It turns a noisy estimate into a confident position size. 
-
-This project says that direct translation risks Kelly-based sizing. It can lead to serious, unmeasured issues. The proposed method treats win probability as a Beta-distributed random variable, not a fixed number. Wins and losses update a prior distribution using Bayes' theorem. This produces a posterior that shows both the evidence and remaining uncertainty. By applying the Kelly formula to 10,000 draws from this posterior, we get a range of recommended stakes. This range is broad with weak evidence and narrow with strong evidence. This results in a cautious, percentile-based policy. 
-
-The 25th percentile of this distribution, called p25, is the suggested default stake. It’s optimal if the true win rate falls within the upper three-quarters of the uncertainty range. Four scenarios demonstrate the practical effects of this framework. With just 12 observations, the posterior is too broad. It can’t confidently support a 16% stake based on a point estimate. Kelly responds with a near-zero size at the conservative percentile. 
-
-The second and third scenarios show that as more evidence comes in, the p25 recommendation moves closer to full Kelly. This illustrates the framework’s self-correcting nature. The fourth scenario is crucial. It uses the same inputs as the first but simulates outcomes at a true win rate of 52%, rather than the posterior mean of 56%. This small difference highlights how in-sample models can overstate out-of-sample performance. Full Kelly is heavily punished, while the p25 stake remains intact. The overconfidence premium is the gap between median and conservative Kelly recommendations. This gap helps risk managers and investment committees see how reliable an edge estimate is."
+The standard Kelly Criterion converts a win-probability estimate directly into a position size — a translation that ignores the noise inherent in any finite sample. This project treats win probability as a Beta-distributed random variable, updating a prior with observed wins and losses via Bayes' theorem to produce a posterior distribution over plausible edge values. Applying the Kelly formula to 10,000 draws from that posterior yields a distribution of recommended stakes rather than a single number. The 25th percentile of that distribution (p25) serves as the default stake: optimal if the true win rate falls anywhere in the upper three-quarters of the uncertainty range. Four scenarios trace the framework's behavior from sparse data through rich evidence, and conclude with a stress test showing that conservative sizing survives model optimism while full Kelly does not.
 
 ---
 
-## Key concepts
+## Tech Stack
 
-**Bayesian updating** — Prior beliefs about the win probability are updated using observed wins and losses via Bayes' theorem. For a Binomial likelihood with a Beta prior, the posterior is analytically tractable: Beta(α + wins, β + losses).
-
-**Kelly fraction distribution** — Rather than computing a single Kelly recommendation, 10,000 values of the win probability are drawn from the posterior. Each produces a Kelly fraction. The resulting distribution reveals the full range of defensible stakes given the available evidence.
-
-**Percentile-based staking** — The p25 Kelly fraction — the stake that is optimal if the true win rate is anywhere in the upper 75% of the uncertainty range — is proposed as the recommended default. The gap between p25 and p50 (the overconfidence premium) quantifies the cost of treating an estimated probability as a known one.
-
-**Scenario 4: Optimism meets reality** — The most important scenario in the document. Identical inputs to Scenario 1, but the wealth simulation uses a true win rate of 52% rather than the posterior mean of 56.3%. This is the out-of-sample test: full Kelly degrades badly; the p25 stake survives.
+- **Language:** R
+- **Framework:** [Quarto](https://quarto.org/)
+- **Primary Libraries:** ggplot2, plotly, dplyr, tidyr, knitr, kableExtra, scales, htmltools, sessioninfo
+- **Deployment / Output:** Self-contained HTML Document
 
 ---
 
-## Repository structure
+## Repository Structure
 
 ```
-bayesian-kelly/
-├── bayesian_kelly_scenarios.qmd   # Main Quarto document
-├── _brand.yml                     # Brand colours and typography
-├── README.md                      # This file
-└── docs/                          # Rendered HTML output (GitHub Pages)
-    └── index.html
+├── data/               # No external data required (all scenarios are simulated)
+├── scripts/            # Helper R scripts
+├── output/             # Rendered HTML files
+├── _brand.yml          # Brand configuration
+└── index.qmd           # Main Quarto entry point
 ```
 
 ---
 
-## Reproducing the analysis
+## Key Findings
 
-### Prerequisites
+**Sparse data produces near-zero conservative stakes — correctly.** With only 12 observations and a 58% win rate, the traditional Kelly formula recommends a confident 16% stake. The Bayesian framework's p25 recommendation is zero: not because the edge is absent, but because the posterior is too wide to distinguish a genuine edge from sampling noise. The overconfidence premium — the gap between p50 and p25 Kelly recommendations — is 13 percentage points, a direct measure of how much an analyst over-stakes by ignoring estimation uncertainty.
 
-R 4.3 or later with the following packages:
+**Evidence earns the right to size up; it cannot be assumed.** Scenarios 1 through 3 use comparable win rates (56%–64%) but increasing sample sizes (12, 25, and 50 trials). The p25 recommendation moves from zero to 8% to 20% as evidence accumulates — not because the strategy improves, but because the posterior tightens. By Scenario 3, the overconfidence premium has compressed to 8.9 percentage points and p25 has converged toward p50. The framework is self-correcting: caution is a function of uncertainty, not disposition.
 
-```r
-library(plotly)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(knitr)
-library(kableExtra)
-library(scales)
-library(htmltools)
-library(sessioninfo)
-```
-
-Quarto 1.4 or later. Install from [quarto.org](https://quarto.org).
-
----
-
-## Design standards
-
-- **Theme:** Quarto Sandstone (Bootswatch)
-- **Brand:** Custom palette defined in `_brand.yml` — off-white background, dark grey text, blue/red/green accent ramps
-- **Typography:** Roboto (Google Fonts, via `_brand.yml`)
-- **Visualizations:** `ggplotly()` for density overlays, `plot_ly()` / `add_bars()` for Kelly histograms and trajectory panels
-- **Tables:** `kbl()` + `kable_styling()` with striped, hover, condensed, responsive bootstrap options
-- **No Shiny, no OJS** — document renders to a standalone HTML file that works from the filesystem or any web host
-
----
-
-## Related projects
-
-This is Project 1 in a three-part series on Bayesian position sizing:
-
-- **Project 1 (this document):** Bayesian Kelly under single-asset uncertainty
-- **Project 2 (planned):** Multi-asset Kelly — portfolio allocation with correlated returns
-- **Project 3 (planned):** Regime-aware Kelly — GARCH-EVT volatility regimes and tail-adjusted sizing
+**A 4-point model overstatement compounds into near-ruin at full Kelly.** Scenario 4 uses identical inputs to Scenario 1 but simulates outcomes at a true win rate of 52% rather than the posterior mean of 56%. Full Kelly — sized for a 56% world — produces a median terminal bankroll of $50,466 after 200 bets and a 90.5% median drawdown. The p25 stake, already near zero because the posterior was wide, preserves capital almost entirely. The overconfidence premium is not a theoretical curiosity; it is the cost of misplaced precision.
 
 ---
 
 ## License
 
-MIT License. You are free to use, adapt, and republish this analysis with attribution.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ---
 
-*Rendered with [Quarto](https://quarto.org/) · Packages: `plotly`, `dplyr`, `tidyr`, `ggplot2`, `knitr`, `kableExtra`, `scales`, `htmltools`, `sessioninfo`*
+## Contact
+
+Patrick Lefler — [LinkedIn](https://www.linkedin.com/in/patricklefler/) | [GitHub Pages](https://patrick-lefler.github.io) | [Substack](https://substack.com/@pflefler)
